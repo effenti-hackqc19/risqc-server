@@ -4,6 +4,9 @@ import sys
 from flask import Flask
 from flask import jsonify
 from flask import request
+from flask import Response
+
+from flask_cors import CORS
 
 from exceptions import HTTPError
 
@@ -12,6 +15,7 @@ from dataloader import dfs, parse_polygon
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route("/ping")
 def ping():
@@ -24,8 +28,8 @@ def get_location_risqs():
     print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
     ret = dfs.iloc[[0, 1]]
     ret['GEOMETRIE'] = ret['GEOMETRIE'].apply(lambda x: parse_polygon(x))
-    return ret.to_json(orient='records')
-
+    return Response(ret.to_json(orient='records'), mimetype='application/json')
+    
 @app.errorhandler(HTTPError)
 def handle_http_error(error):
     response = jsonify(error.to_dict())
