@@ -7,7 +7,7 @@ from flask import request
 
 from exceptions import HTTPError
 
-from dataloader import dfs
+from dataloader import dfs, parse_polygon
 
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
@@ -22,7 +22,9 @@ def get_location_risqs():
     lat = request.args.get('lat')
     lon = request.args.get('long')
     print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
-    return jsonify(dfs.head(2).values.tolist())
+    ret = dfs.iloc[[0, 1]]
+    ret['GEOMETRIE'] = ret['GEOMETRIE'].apply(lambda x: parse_polygon(x))
+    return ret.to_json(orient='records')
 
 @app.errorhandler(HTTPError)
 def handle_http_error(error):
