@@ -7,15 +7,25 @@ from flask import request
 from flask import Response
 
 from flask_cors import CORS
+from flaskext.mysql import MySQL
+
 
 from exceptions import HTTPError
+from calculate_distance import compute_distances
 
-from dataloader import dfs, parse_polygon
-
+from dataloader import dfs
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+mysql = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+app.config['MYSQL_DATABASE_DB'] = 'risqc'
+app.config['MYSQL_DATABASE_HOST'] = '0.0.0.0'
+mysql.init_app(app)
+
+CORS(app)
 
 @app.route("/ping")
 def ping():
@@ -25,10 +35,10 @@ def ping():
 def get_location_risqs():
     lat = request.args.get('lat')
     lon = request.args.get('long')
+    point_coord = [lon, lat]
     print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
-    ret = dfs.iloc[[0, 1]]
-    ret['GEOMETRIE'] = ret['GEOMETRIE'].apply(lambda x: parse_polygon(x))
-    return Response(ret.to_json(orient='records'), mimetype='application/json')
+    top_min = compute_distances(point_coord, dfs)
+    return Response(top_min.to_json(orient='records'), mimetype='application/json')
     
 @app.errorhandler(HTTPError)
 def handle_http_error(error):
