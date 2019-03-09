@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+    app-server:
+        build:
+            context: .
+        container_name: app-server
+        volumes:
+            - ./:/home/app
+        ports:
+            - "4004:4004"
