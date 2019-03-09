@@ -7,6 +7,8 @@ from flask import request
 
 from exceptions import HTTPError
 
+from dataloader import dfs
+
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
 app = Flask(__name__)
@@ -20,7 +22,7 @@ def get_location_risqs():
     lat = request.args.get('lat')
     lon = request.args.get('long')
     print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
-    return jsonify([])
+    return jsonify(dfs.head(2).values.tolist())
 
 @app.errorhandler(HTTPError)
 def handle_http_error(error):
