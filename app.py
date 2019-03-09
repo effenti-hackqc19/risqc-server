@@ -1,4 +1,5 @@
 import os
+import sys
 
 from flask import Flask
 from flask import jsonify
@@ -14,8 +15,11 @@ app = Flask(__name__)
 def ping():
     return "pong"
 
-@app.route("/<coord>")
-def get_location_risqs(coord):
+@app.route("/risqs")
+def get_location_risqs():
+    lat = request.args.get('lat')
+    lon = request.args.get('long')
+    print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
     return jsonify([])
 
 @app.errorhandler(HTTPError)
