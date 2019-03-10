@@ -9,6 +9,12 @@ def compute_distance(point_coord, poly_def):
     poly = Polygon(poly_def)
     return poly.distance(point)
 
+#EN COURS
+def compute_borne_distance(point_coord, point_def):
+    point = Point(point_coord)
+    point_comp = Point(point_def)
+    return point_comp.distance(point)
+
 def compute_distances(point_coord, polys_df):
     data_with_distances = np.array([])
     dist_arr_with_indices = np.array([])
@@ -21,6 +27,17 @@ def compute_distances(point_coord, polys_df):
     min_indices = np.argpartition(dist_arr_with_indices, TOP_MIN)
     return np.take(data_with_distances, min_indices)
 
+def compute_bornes_distances(point_coord, bornes_df):
+    data_with_distances = np.array([])
+    dist_arr_with_indices = np.array([])
+    for index, row in bornes_df.iterrows():
+        row['COORDONNEES'] = parse_bornes(row['COORDONNEES'])
+        dist = compute_distance(point_coord, row['COORDONNEES'])
+        dist_arr_with_indices.append(dist)
+        row['dist'] = dist
+        data_with_distances.append(row)
+    min_indices = np.argpartition(dist_arr_with_indices, TOP_MIN)
+    return np.take(data_with_distances, min_indices)
 
 #poly = Polygon([[25.774252, -80.190262], [18.466465, -66.118292], [32.321384, -64.75737], [25.774252, -80.190262]] )
 #point = Point([26.254629577800088, -72.728515625] )
