@@ -1,19 +1,21 @@
 from shapely.geometry import Polygon, Point
 from dataloader import parse_polygon
 import numpy as np
+import mpu
 
 TOP_MIN = 10
+TOP_MIN_BORNE = 100
 
 def compute_distance(point_coord, poly_def):
     point = Point(point_coord)
     poly = Polygon(poly_def)
     return poly.distance(point)
 
-#EN COURS
-def compute_borne_distance(point_coord, point_def):
-    point = Point(point_coord)
-    point_comp = Point(point_def)
-    return point_comp.distance(point)
+def compute_borne_distance(point_coord, point_X_def, point_Y_def):
+    gps = (point_coord[0], point_coord[1])
+    dis_point = (point_X_def, point_Y_def)    
+    dist = round(mpu.haversine_distance(munich, berlin), 1)    
+    return dist
 
 def compute_distances(point_coord, polys_df):
     data_with_distances = np.array([])
@@ -32,14 +34,9 @@ def compute_bornes_distances(point_coord, bornes_df):
     dist_arr_with_indices = np.array([])
     for index, row in bornes_df.iterrows():
         row['COORDONNEES'] = parse_bornes(row['COORDONNEES'])
-        dist = compute_distance(point_coord, row['COORDONNEES'])
+        dist = compute_borne_distance(point_coord, row['LONGITUDE'], row['LATITUDE'])
         dist_arr_with_indices.append(dist)
         row['dist'] = dist
         data_with_distances.append(row)
-    min_indices = np.argpartition(dist_arr_with_indices, TOP_MIN)
+    min_indices = np.argpartition(dist_arr_with_indices, TOP_MIN_BORNE)
     return np.take(data_with_distances, min_indices)
-
-#poly = Polygon([[25.774252, -80.190262], [18.466465, -66.118292], [32.321384, -64.75737], [25.774252, -80.190262]] )
-#point = Point([26.254629577800088, -72.728515625] )
-
-#poly.distance(point)

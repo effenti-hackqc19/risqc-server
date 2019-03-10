@@ -13,7 +13,7 @@ from flaskext.mysql import MySQL
 from exceptions import HTTPError
 from calculate_distance import compute_distances, compute_bornes_distances
 
-from dataloader import dfs, dfs_bornes
+from dataloader import dfs, dfs_bornes['COORDONNEES']
 
 FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
 app = Flask(__name__)
@@ -38,7 +38,9 @@ def get_location_risqs():
     point_coord = [lon, lat]
     print('long {} , lat : {}'.format(lon, lat), file=sys.stderr)
     top_min = compute_distances(point_coord, dfs)
+    #A PLUGGER
     bornes = compute_bornes_distances(point_coord, dfs_bornes)
+
     return Response(top_min.to_json(orient='recor   ds'), mimetype='application/json')
     
 @app.errorhandler(HTTPError)
